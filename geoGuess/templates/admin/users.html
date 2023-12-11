@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+      crossorigin="anonymous"
+    ></script>
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  </head>
+  <body>
+    {% block content %}
+    <title>See Users</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'geoGuess.css' %}" type="text/css"/>
+
+    <div class="container p-5 d-flex align-items-center justify-content-center">
+      <div style="width: 500px">
+        <h1 class="text-center">Control Users</h1>
+        <div id="liveAlertPlaceholder"></div>
+
+        <ul class="list-group mt-4" style="max-width: 600px">
+          {% for user in user_list%}
+          <form method="post" action="{% url 'user_edit' user_id=user.id %}">
+            {% csrf_token %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              
+                <div class="d-flex align-items-center">
+                  <b>{{user}}</b>
+                  <div class="form-check form-switch mx-3" style="margin-bottom: 0;">
+                    <label class="form-check-label" for="admin">Admin</label>
+                    <input id="admin" name="admin" class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" {% if user.is_staff %}checked{% endif %}>
+                  </div> 
+                </div>
+                <div class="justify-content-end d-flex align-items-center">
+                  <button type="submit" name="editAuth" class="btn btn-primary btn-sm">Save Auth</button>
+                  <button type="button" class="btn btn-danger btn-sm ms-2" data-bs-toggle="modal" data-bs-target="#deleteModal_{{user.id}}">Remove</button>
+                </div>
+            </li>
+          </form>
+
+            <!-- DELETE Modal -->
+            <div class="modal fade" id="deleteModal_{{user.id}}" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Delete User Confirmation</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    Are you sure that you would like to remove '{{user}}' from HoosWhere? This will remove all leaderboard and challenge data from their account.
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form method="post" action="{% url 'user_edit' user_id=user.id %}">
+                      {% csrf_token %}
+                      <button type="submit" name='deleteUser' class="btn btn-danger">Remove</button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+
+  {% endblock %}
+  </body>
+</html>

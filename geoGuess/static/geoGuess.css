@@ -1,0 +1,64 @@
+html,
+body {
+    height: 100%;
+    background-image: linear-gradient(120deg, #f4f4f8, #e0eafc);
+    margin: 0;
+    padding: 0;
+}
+
+#pano {
+    margin: 0 auto;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border-radius: 10px;
+    height: 55vh;
+    width: 80%;
+    background-color: #ffffff;
+    margin-right: 20px;
+
+}
+
+#guessMap {
+    position: relative;
+    height: auto;
+}
+
+#guessButton {
+   // border: 2px solid transparent;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #ffffff;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+#guessButton:hover {
+    background-color: #0056b3;
+}
+
+#map {
+    margin: 0 auto;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border-radius: 10px;
+    height: 55vh;
+    background-color: #ffffff;
+    margin-left: 20px;
+}
+
+#image {
+    margin: 0 auto;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border-radius: 10px;
+    height: 55vh;
+    width: 85%;
+    background-color: #ffffff;
+    margin-right: 30px;
+}
+
+#distance {
+    font-size: 1.2em;
+    color: #333;
+}

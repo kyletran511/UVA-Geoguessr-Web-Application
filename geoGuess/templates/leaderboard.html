@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block head %}
+    <style>
+        .align-middle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+{% endblock head %}
+{% block content %}
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'geoGuess.css' %}" type="text/css"/>
+
+<body>
+    <title>Leaderboard</title>
+    <div class="container my-3 d-flex align-items-center justify-content-center">
+        <div style="width: 500px">
+            <h1 class="text-center">Leaderboard</h1>
+            <table class="table">
+                <thead>
+                    <tr class="text-center">
+                        <th scope="col">#</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Avg Score</th>
+                        <th scope="col">Games Played</th>
+                        <th score="col">Rating</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for player in leaderboard %}
+                    <tr >
+                        <th class="text-center" scope="row">
+                            {% if forloop.counter == 1 %}
+                                <img width="40" height="40" src="https://img.icons8.com/arcade/64/trophy.png" alt="trophy"/>
+                            {% elif forloop.counter == 2 %}
+                                <img width="40" height="40" src="https://img.icons8.com/arcade/64/second-place-ribbon.png" alt="second-place-ribbon"/>
+                            {% elif forloop.counter == 3 %}
+                                <img width="40" height="40" src="https://img.icons8.com/arcade/64/third-place-ribbon.png" alt="third-place-ribbon"/>
+                            {% else %}
+                                {{ forloop.counter }}
+                            {% endif %}
+                        </th>
+                        <td class="align-middle text-center">
+                            <a href="{% url 'profile' player.id %}">
+                                {{ player.name }}
+                            </a>
+                        </td>
+                        <td class="align-middle text-center">{{ player.average_score }}</td>
+                        <td class="align-middle text-center">{{ player.games_played }}</td>
+                        <td class="align-middle text-center">{{ player.rating }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+
+{% endblock content %}

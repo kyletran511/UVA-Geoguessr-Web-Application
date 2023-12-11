@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+{% load nav_bar %}
+{% load static %}
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+      crossorigin="anonymous"
+    ></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="{% static 'Game Logo.png' %}">
+    <style>
+      /* Custom styles for the base */
+      body {
+        background-color: #f4f4f8; /* light grayish background */
+      }
+
+      .navbar-nav .nav-item.active a {
+            color: #000000; /* White text color for better visibility */
+            font-weight: bold; /* Bold text */
+      }
+    </style>
+  </head>
+  <body>
+    {% if user.is_authenticated %}
+      {% if user.is_staff %}
+      <nav class="navbar navbar-expand-lg sticky-top bg-body-tertiary" style="z-index: 1000; background-image: linear-gradient(120deg, #f4f4f8, #e0eafc)">
+        <div class="container-fluid">
+          <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
+            HoosWhere?
+            <img src="{% static 'Game Logo.png' %}" alt="Logo" style="height:40px; width:auto; margin-right:10px;">
+          </a>
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarNav"
+            aria-controls="navbarNav"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <li class="nav-item {% is_active 'approve_submissions' %}">
+                <a class="nav-link" href="{% url 'approve_submissions' %}">Approve Submissions</a>
+              </li>
+              <li class="nav-item {% is_active 'admin_users' %}">
+                <a class="nav-link" href="{% url 'admin_users' %}">See Users</a>
+              </li>
+              <li class="nav-item {% is_active 'challenge_bank' %}">
+                <a class="nav-link" href="{% url 'challenge_bank' %}">See Challenge Bank</a>
+              </li>
+      {% else %}
+      <nav class="navbar navbar-expand-lg sticky-top bg-body-tertiary" style="z-index: 1000; background-image: linear-gradient(120deg, #f4f4f8, #e0eafc)">
+        <div class="container-fluid">
+          <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
+            HoosWhere?
+            <img src="{% static 'Game Logo.png' %}" alt="Logo" style="height:40px; width:auto; margin-right:10px;">
+          </a>
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarNav"
+            aria-controls="navbarNav"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <li class="nav-item {% is_active 'about' %}">
+                <a class="nav-link" href="{% url 'about' %}">About</a>
+              </li>
+              <li class="nav-item {% is_active 'daily_challenge_list' %}">
+                <a class="nav-link" href="{% url 'daily_challenge_list' %}">Daily Challenges</a>
+              </li>
+              <li class="nav-item {% is_active 'challenge' %}">
+                <a class="nav-link" href="{% url 'challenge' %}">Create Challenge</a>
+              </li>
+               <li class="nav-item {% is_active 'submissions' %}">
+                <a class="nav-link" href="{% url 'submissions' %}">View Submissions</a>
+              </li>
+              <li class="nav-item {% is_active 'leaderboard' %}">
+                <a class="nav-link" href="{% url 'leaderboard' %}">Leaderboard</a>
+              </li>
+        {% endif %}
+          </ul>
+          <span
+            class="navbar-text d-flex align-items-center"
+            style="height: 30px"
+          >
+            {% block user_greeting %}
+            <a href="{% url 'home' %}" style="text-decoration: none">
+              Hello, {{ user.socialaccount_set.all.0.extra_data.name }}!
+            <img
+              class="user-icon mx-2"
+              src="{{ user.socialaccount_set.all.0.get_avatar_url }}"
+              alt="User Image"
+              style="height: 30px; width: 30px; border-radius: 50%;"
+            />
+            </a>
+            {% endblock %}
+          </span>
+        </div>
+      </div>
+    </nav>
+    {% endif %}
+    {% block content %} 
+    {% endblock content %}
+  </body>
+</html>

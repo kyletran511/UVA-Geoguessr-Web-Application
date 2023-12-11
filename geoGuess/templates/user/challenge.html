@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% block content %}
+<title>Create Challenge</title>
+
+<!-- Google Maps CSS -->
+{% load static %}
+<link rel="stylesheet" href="{% static 'geoGuess.css' %}" type="text/css"/>
+
+<svg xmlns="http://www.w3.org/2000/svg" class="d-none">
+    <symbol id="exclamation-triangle-fill" viewBox="0 0 16 16">
+        <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+    </symbol>
+</svg>
+
+<!-- Google Maps API -->
+<script src="https://maps.googleapis.com/maps/api/js?key={{ maps_api_key }}&callback=initialize&v=weekly"
+        defer></script>
+<body>
+<div class="text-center my-3">
+    <h2> Create Your Own Challenge</h2>
+    <h6 class="mx-5"> In the space below, upload an image at UVA, you would like to be featured in a future challenge
+        :)  Then, click below where the location is on the map. Once, you hit submit, you should be able to go to the "View Submissions" and see if your
+        submission gets approved. </h6>
+</div>
+<div class ="text-center">
+    <form id="form" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.formset.errors }}
+        {{ form.non_field.errors }}
+        <!-- Image Upload Field -->
+        <div class="input-group mt-3 mx-auto" style="width: 25%;">
+            <input type="file" name="image" id="id_image" class="form-control" id="inputGroupFile02" required>
+        </div>
+        <br>
+        <!-- Hidden Longitude and Latitude Fields (filled by the map click) -->
+        <input type="hidden" name="longitude" id="id_longitude">
+        <input type="hidden" name="latitude" id="id_latitude">
+
+        <!-- Map Div -->
+        <div class="text-center" id="map" style=" width: 80%; height: 45vh; margin: 0 auto;"></div>
+        <br>
+        <div id="error-message" class="alert alert-danger align-items-center mx-auto" role="alert" style="display: none; max-width: 42%;">
+            <svg class="bi flex-shrink-0 me-2" role="img" style="height: 20px; width: 20px;" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+            Please place a marker on the map for the corresponding image!
+        </div>
+
+        <button class="btn btn-primary mb-4" type="submit" value="Submit" class="my-3 text-white bg-primary">Submit</button>
+    </form>
+</div>
+<!-- Google Maps Initialization -->
+<script>
+    var map;
+    var marker;
+    var form = document.getElementById("form")
+
+    function initialize() {
+        const defaultLocation = {lat: 38.0336, lng: -78.5080}; //can change locationvar mapOptions = {
+
+        map = new google.maps.Map(document.getElementById("map"), {
+            center: defaultLocation,
+            mapTypeId: google.maps.MapTypeId.HYBRID,
+            zoom: 18,
+            labels: true,
+        });
+        map.setTilt(45);
+        google.maps.event.addListener(map, 'click', function (event) {
+            placeMarker(event.latLng);
+        });
+
+    }
+
+    function placeMarker(location) {
+        if (marker) {  // if marker exists, remove it
+            marker.setMap(null);
+        }
+        marker = new google.maps.Marker({
+            position: location,
+            map: map
+        });
+
+        // Update the hidden form fields with the clicked coordinates
+        document.getElementById('id_longitude').value = location.lng();
+        document.getElementById('id_latitude').value = location.lat();
+    }
+
+    form.addEventListener("submit", function (event) {
+        // Check if latitude and longitude are empty
+        var latitude = document.getElementById('id_latitude').value;
+        var longitude = document.getElementById('id_longitude').value;
+
+        // Error message element
+        var errorMessage = document.getElementById("error-message");
+
+        if (!latitude || !longitude) {
+            // Display an error message
+            errorMessage.style.display = 'flex';
+            errorMessage.style.color = "red";
+
+            // Prevent form submission
+            event.preventDefault();
+        }
+    });
+
+    // This function will be called once the Google Maps script is loaded
+    initialize();
+</script>
+</body>
+{% endblock content %}

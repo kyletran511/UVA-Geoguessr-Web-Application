@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% block content %}
+<body>
+    {% load static %}
+    <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
+        <symbol id="check-circle-fill" viewBox="0 0 16 16">
+          <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+        </symbol>
+    </svg>
+
+    <link rel="stylesheet" href="{% static 'geoGuess.css' %}" type="text/css" />
+
+    <!-- Google Maps API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ maps_api_key }}&callback=initialize&v=weekly" defer></script>
+    <title>📅Daily Challenge</title>
+    <meta name="viewport" content="width=device-width, initial-scale=0.5" />
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+
+    <div class="container text-center my-3">
+        <div class="pb-2">
+            <h1> {{ DailyChallenge.timestamp|date:"F d, Y"}} </h1>
+            <h5> Challenge by {{Guess.challenge.user}}</h5>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <img src="{{Challenge.image.url}}" class="img-fluid" style="width: 100%; height: 350px; display: block; margin: 0 auto; border-radius: 5%; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);">
+            </div>
+            <div class="col-md-6">
+                <div class="">
+                    <div class="text-center" id="map" style="height: 350px; border-radius: 5%; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);"></div>
+                </div>
+            </div>
+        </div>
+        <div class="alert alert-success d-flex align-items-center my-4 mx-auto" style="max-width: 55%;" role="alert">
+            <svg class="bi flex-shrink-0 me-2" role="img"  style="height: 20px; width: 20px;" aria-label="Success:"><use xlink:href="#check-circle-fill"/></svg>
+            <div>
+                Your guess was {{ Guess.distanceFromAnswer|floatformat:2 }} meters away from answer. You earned {{ Guess.score }} of 1000 points!
+            </div>
+        </div>
+{% if daily_leaderboard %}
+<div class="my-4">
+    <h2>Top Scores</h2>
+    <div class="table-responsive" style="height: 200px; overflow-y: auto;">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Score</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in daily_leaderboard %}
+                <tr>
+                    <th class="text-center" scope="row">
+                        {% if forloop.counter == 1 %}
+                            <img width="40" height="40" src="https://img.icons8.com/arcade/64/trophy.png" alt="1st place trophy"/>
+                        {% elif forloop.counter == 2 %}
+                            <img width="40" height="40" src="https://img.icons8.com/arcade/64/second-place-ribbon.png" alt="2nd place ribbon"/>
+                        {% elif forloop.counter == 3 %}
+                            <img width="40" height="40" src="https://img.icons8.com/arcade/64/third-place-ribbon.png" alt="3rd place ribbon"/>
+                        {% else %}
+                            {{ forloop.counter }}
+                        {% endif %}
+                    </th>
+                    <td>{{ entry.username }}</td>
+                    <td>{{ entry.score }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" class="text-center">No submissions yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+
+
+
+
+
+    {% load static %}
+      <!-- Google Maps Initialization -->
+        <script>
+            var map;
+            var guess_marker;
+            var answer_marker;
+            var form = document.getElementById("form");
+
+            function initialize() {
+                var guess_latitude = {{ Guess.latitude }};
+                var guess_longitude = {{ Guess.longitude }};
+
+                var mapOptions = {
+                    center: new google.maps.LatLng(guess_latitude, guess_longitude),
+                    zoom: 15
+                };
+
+                map = new google.maps.Map(document.getElementById("map"), mapOptions);
+                guess_marker = new google.maps.Marker({
+                    visible: true,
+                    position: new google.maps.LatLng(guess_latitude,guess_longitude),
+                    map: map,
+                });
+                // TODO: make different color marker for answer
+                //Can Change If Needed, AdvancedMarkerElement enables Maps Javascript API
+                var answer_latitude = {{ Guess.challenge.latitude }};
+                var answer_longitude = {{ Guess.challenge.longitude }};
+                answer_marker = new google.maps.Marker({
+                     map: map,
+                     position: { lat: answer_latitude, lng: answer_longitude },
+                     icon: { url: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"},
+                     title: "Answer"
+                 });
+            }
+
+            initialize();
+        </script>
+</body>
+{% endblock content %}

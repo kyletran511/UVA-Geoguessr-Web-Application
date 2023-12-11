@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'geoGuess.css' %}" type="text/css"/>
+<body>
+    {% load static %}
+    <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
+        <symbol id="exclamation-triangle-fill" viewBox="0 0 16 16">
+            <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+        </symbol>
+    </svg>
+
+    <!-- Google Maps API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ maps_api_key }}&callback=initialize&v=weekly" defer></script>
+    <title>📅Daily Challenge</title>
+    <meta name="viewport" content="width=device-width, initial-scale=0.5" />
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    <form id="form" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.formset.errors }}
+        <!-- Hidden Longitude and Latitude Fields (filled by the map click) -->
+        <input type="hidden" name="longitude" id="id_longitude" required>
+        <input type="hidden" name="latitude" id="id_latitude" required>
+        <div class="container text-center my-3">
+            <div class="pb-2">
+                <h1> {{ DailyChallenge.timestamp|date:"F d, Y"}} </h1>
+                <h5> Challenge by {{Challenge.user}}</h5>   
+            </div>   
+            <div class="row">
+                <div class="col-md-6">
+                    <img src="{{Challenge.image.url}}" class="img-fluid" style="width: 100%; height: 350px; display: block; margin: 0 auto; border-radius: 5%; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);">
+                </div>
+                <div class="col-md-6">
+                    <div class="text-center" id="map" style="height: 350px; width: 100%; border-radius: 5%; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);"></div>
+                </div>
+            </div>
+            <div id="error-message" class="alert alert-danger align-items-center mx-auto mt-3" role="alert" style="display: none; max-width: 42%;">
+                <svg class="bi flex-shrink-0 me-2" role="img" style="height: 20px; width: 20px;" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+                Must select part of the map!
+            </div>
+        </div>
+        <button type="submit" value="Submit" id="guessButton" class="btn btn-primary mt-3 mx-auto d-block">Make a Guess</button>
+    </form>
+
+
+    {% load static %}
+      <!-- Google Maps Initialization -->
+        <script>
+            var map;
+            var marker;
+            var form = document.getElementById("form")
+
+            function initialize() {
+                var mapOptions = {
+                    center: new google.maps.LatLng(38.03555, -78.50333),
+                    zoom: 15
+                };
+
+                map = new google.maps.Map(document.getElementById("map"), mapOptions);
+
+                google.maps.event.addListener(map, 'click', function (event) {
+                    placeMarker(event.latLng);
+                });
+            }
+
+            function placeMarker(location) {
+                if (marker) {  // if marker exists, remove it
+                    marker.setMap(null);
+                }
+                marker = new google.maps.Marker({
+                    position: location,
+                    map: map
+                });
+
+                // Update the hidden form fields with the clicked coordinates
+                document.getElementById('id_longitude').value = location.lng();
+                document.getElementById('id_latitude').value = location.lat();
+            }
+
+            form.addEventListener("submit", function (event) {
+                // Check if latitude and longitude are empty
+                var latitude = document.getElementById('id_latitude').value;
+                var longitude = document.getElementById('id_longitude').value;
+
+                // Error message element
+                var errorMessage = document.getElementById("error-message");
+
+                if (!latitude || !longitude) {
+                    // Display an error message
+                    errorMessage.style.display = 'flex';
+                    errorMessage.style.color = "red";
+
+                    // Prevent form submission
+                    event.preventDefault();
+                }
+            });
+
+            // TO-DO: add error check if marker isn't placed
+            // This function will be called once the Google Maps script is loaded
+            initialize();
+        </script>
+</body>
+{% endblock content %}
